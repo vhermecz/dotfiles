@@ -1,0 +1,9 @@
+[user]
+    name = ${MY_NAME}
+    email = ${MY_EMAIL}
+[push]
+    autoSetupRemote = true
+[fetch]
+    prune = true
+[includeIf "gitdir/i:${WORK_GIT}/**"]
+    path = ${WORK_GIT}/.gitconfig

@@ -1,0 +1,59 @@
+[default]
+region = us-east-1
+cli_pager = 
+
+[sso-session airdna]
+sso_start_url = https://airdna.awsapps.com/start
+sso_region = us-east-1
+sso_registration_scopes = sso:account:access
+
+[profile airdna-dev]
+sso_session = airdna
+sso_account_id = 442893755979
+sso_role_name = techops
+region = us-east-1
+cli_pager = 
+
+[profile airdna-prod]
+sso_session = airdna
+sso_account_id = 391313676783
+sso_role_name = techops
+region = us-east-1
+cli_pager = 
+
+[profile airdna-svc]
+sso_session = airdna
+sso_account_id = 537022569116
+sso_role_name = techops
+region = us-east-1
+cli_pager = 
+
+# ADMIN PROFILES
+
+[profile airdna-dev-admin]
+sso_session = airdna
+sso_account_id = 442893755979
+sso_role_name = administrators
+region = us-east-1
+cli_pager = 
+
+[profile airdna-prod-admin]
+sso_session = airdna
+sso_account_id = 391313676783
+sso_role_name = administrators
+region = us-east-1
+cli_pager = 
+
+[profile airdna-svc-admin]
+sso_session = airdna
+sso_account_id = 537022569116
+sso_role_name = administrators
+region = us-east-1
+cli_pager = 
+
+[profile airdna-sandbox]
+sso_session = airdna
+sso_account_id = 679855187763
+sso_role_name = administrators
+region = us-east-1
+cli_pager = 

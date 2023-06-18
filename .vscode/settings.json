@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "Brewfile.*.json": "json",
+        "Brewfile.*": "ruby"
+    }
+}

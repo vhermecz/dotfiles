@@ -1,0 +1,17 @@
+# Stuff I want installed everywhere, but is for work
+# so I might not always need it.
+
+brew 'awscli'
+brew 'argocd'
+brew 'helm'
+brew 'hey'
+brew 'kubectx'
+brew 'kubectl'
+brew 'kube-ps1'
+brew 'linkerd'
+brew 'postgresql@15'
+brew 'stern'
+brew 'velero'
+
+cask 'coscreen'
+cask 'infra'

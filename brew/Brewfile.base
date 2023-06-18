@@ -1,0 +1,39 @@
+# Stuff I want installed everywhere.
+
+brew 'git'
+brew 'httpie'
+brew 'jq'
+brew 'mas'
+brew 'the_silver_searcher'
+brew 'tig'
+brew 'watch'
+brew 'wget'
+
+# go
+brew 'go'
+brew 'goreleaser'
+
+# python
+brew 'black'
+brew 'python@3.11'
+brew 'pyyaml'
+
+# apps
+cask '1password'
+cask 'beyond-compare'
+cask 'docker'
+cask 'firefox'
+cask 'google-chrome'
+cask 'iterm2'
+cask 'logi-options-plus'
+cask 'openvpn-connect'
+cask 'signal'
+cask 'slack'
+cask 'sublime-text'
+cask 'visual-studio-code'
+cask 'zoom'
+
+# app store
+mas 'CopyClip 2 - Clipboard Manager', id: 1020812363
+mas 'DaisyDisk', id: 411643860
+mas 'Pixelmator Pro', id: 1289583905
