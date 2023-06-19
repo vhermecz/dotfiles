@@ -125,18 +125,17 @@ show_data() {
 do_git_stuff() {
     local git_root=${HOME}/${REPO_DIR}
 
+    # Create the git repo directories if they don't exist.
     local personal="${git_root}/personal"
     if ! dir_exists "${personal}"; then
         info "Creating ${personal}"
         mkdir -p "${personal}"
     fi
-
     local public="${git_root}/public"
     if ! dir_exists "${public}"; then
         info "Creating ${public}"
         mkdir -p "${public}"
     fi
-
     WORK_GIT="${git_root}/${COMPANY}"
     if ! dir_exists "${WORK_GIT}"; then
         info "Creating ${WORK_GIT}"
@@ -153,9 +152,11 @@ do_git_stuff() {
 
 do_bash_stuff() {
     local bashrc=${HOME}/.bashrc
+    # Backup the existing .bashrc if necessary.
     if file_exists "${bashrc}" && ! is_symlink "${bashrc}"; then
         backup_file "${bashrc}"
     fi
+    # Create symlink to our .bashrc file.
     if ! file_exists "${bashrc}"; then
         info "Creating symlink for ~/.bashrc"
         ln -s -f "${MY_DIR}/bash/.bashrc" "${bashrc}"
@@ -166,21 +167,25 @@ do_bash_stuff() {
 
 do_zsh_stuff() {
     local zshrc=${HOME}/.zshrc
+    # Backup the existing .zshrc if necessary.
     if file_exists "${zshrc}" && ! is_symlink "${zshrc}"; then
         backup_file "${zshrc}"
     fi
+    # Create symlink to our .zshrc file.
     if ! file_exists "${zshrc}"; then
         info "Creating symlink for ~/.zshrc"
-        ln -s "${MY_DIR}/zsh/.zshrc" "${zshrc}"
+        ln -s -f "${MY_DIR}/zsh/.zshrc" "${zshrc}"
     fi
 
     local zshenv=${HOME}/.zshenv
+    # Backup the existing .zshenv if necessary.
     if file_exists "${zshenv}" && ! is_symlink "${zshenv}"; then
         backup_file "${zshenv}"
     fi
+    # Create symlink to our .zshenv file.
     if ! file_exists "${zshenv}"; then
         info "Creating symlink for ~/.zshenv"
-        ln -s "${MY_DIR}/zsh/.zshenv" "${zshenv}"
+        ln -s -f "${MY_DIR}/zsh/.zshenv" "${zshenv}"
     fi
 
     success "Configured zsh"
@@ -188,37 +193,49 @@ do_zsh_stuff() {
 
 do_omz_stuff() {
     local theme=${HOME}/.oh-my-zsh/themes/jjeffers.zsh-theme
+    # Backup the existing theme if necessary.
     if file_exists "${theme}" && ! is_symlink "${theme}"; then
         backup_file "${theme}"
     fi
+    # Create symlink to our theme.
     if ! file_exists "${theme}"; then
         info "Creating symlink for oh-my-zsh theme"
-        ln -s "${MY_DIR}/zsh/jjeffers.zsh-theme" "${theme}"
+        ln -s -f "${MY_DIR}/zsh/jjeffers.zsh-theme" "${theme}"
     fi
 
     success "Configured oh-my-zsh"
 }
 
 do_aws_stuff() {
-    local awscfg=${HOME}/.aws/config
+    local awsdir=${HOME}/.aws
+    # Create ~/.aws if it doesn't exist.
+    if ! dir_exists "${awsdir}"; then
+        info "Creating directory ${awsdir}"
+        mkdir -p "${awsdir}"
+    fi
+
+    local awscfg=${awsdir}/config
+    # Backup the existing config if necessary.
     if file_exists "${awscfg}" && ! is_symlink "${awscfg}"; then
         backup_file "${awscfg}"
     fi
+    # Create symlink to our config.
     if ! file_exists "${awscfg}"; then
         info "Creating symlink for ~/.aws/config"
-        ln -s "${MY_DIR}/aws/config" "${awscfg}"
+        ln -s -f "${MY_DIR}/aws/config" "${awscfg}"
     fi
 
     success "Configured awscli"
 }
 
 do_iterm_stuff() {
+    # Configure iTerm to use our preferences file.
     if dir_exists "/Applications/iTerm.app"; then
         defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$MY_DIR/iterm"
         defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
-        success "Configured iterm"
+        success "Configured iTerm"
     else
-        error "iTerm not found"
+        error "Cannot find iTerm!"
     fi
 }
 
@@ -239,6 +256,7 @@ main() {
     # shellcheck disable=SC1091
     source "${MY_DIR}/scripts/helpers.sh"
 
+    # Parse arguments.
     while getopts hu flag; do
         case "${flag}" in
             u) UPDATE=true;;
@@ -248,6 +266,7 @@ main() {
 
     validate_prereqs
 
+    # Create the database if necessary.
     if ! file_exists "$DB"; then
         create_db
         # If we have to create the database, prompt the user to update.
