@@ -39,8 +39,8 @@ I like to drop all of my git repos into a top-level folder just under `$HOME`. I
 
 ```
 $HOME
+├─ .gitconfig  <-- global .gitconfig
 └─ git
-   ├─ .gitconfig  <-- global .gitconfig
    ├─ personal/
    ├─ public/
    └─ company-name/
