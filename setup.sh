@@ -198,6 +198,16 @@ do_aws_stuff() {
     success "Configured awscli"
 }
 
+do_iterm_stuff() {
+    if dir_exists "/Applications/iTerm.app"; then
+        defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$MY_DIR/iterm"
+        defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+        success "Configured iterm"
+    else
+        error "iTerm not found"
+    fi
+}
+
 do_brew_stuff() {
     info "\nInstalling Brewfile.base"
     brew bundle --file "${MY_DIR}/brew/Brewfile.base"
@@ -242,6 +252,7 @@ main() {
     do_zsh_stuff
     do_omz_stuff
     do_aws_stuff
+    do_iterm_stuff
     do_brew_stuff
 
     success "\nDone!"
