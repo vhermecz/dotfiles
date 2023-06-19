@@ -10,7 +10,7 @@ cd "${MY_DIR}"
 # Path to the sqlite database that stores user data.
 DB="$MY_DIR/dotfiles.db"
 
-# Don't prompt the user to update their data unless necessary or requested.
+# Don't prompt to update user data unless necessary or requested.
 UPDATE=false
 
 help() {
@@ -23,20 +23,20 @@ help() {
 validate_prereqs() {
     # Make sure brew is installed.
     if ! brew --version &> /dev/null; then
-        echo "Install brew and try again" >&2
+        error "\nInstall brew and try again\n"
         exit 1
     fi
 
     # Make sure oh-my-zsh is installed.
     if ! dir_exists "${HOME}/.oh-my-zsh"; then
-        echo "Install oh-my-zsh and try again" >&2
+        error "\nInstall oh-my-zsh and try again\n"
         exit 1
     fi
 }
 
 # Create and populate the DB with example data.
 create_db() {
-    printf "\nCreating database\n\n"
+    info "\nCreating database"
     sqlite3 "${DB}" "
         CREATE TABLE userdata (
             id INTEGER,
@@ -67,31 +67,31 @@ load_data() {
 update_data() {
     printf "\nPress enter to keep the current values.\n"
 
-    printf "\nBase dir for your repos. Will be created in \$HOME if it doesn't exist.\n"
+    info "\nBase dir for your repos. Will be created in \$HOME if it doesn't exist."
     read -r -p "Repo Dir (${REPO_DIR}): " input
     REPO_DIR="${input:-$REPO_DIR}"
 
-    printf "\nYour name is used in the global .gitconfig\n"
+    info "\nYour name is used in the global .gitconfig"
     read -r -p "Name (${MY_NAME}): " input
     MY_NAME="${input:-$MY_NAME}"
 
-    printf "\nYour personal email used is in the global .gitconfig\n"
+    info "\nYour personal email used is in the global .gitconfig"
     read -r -p "Email (${MY_EMAIL}): " input
     MY_EMAIL="${input:-$MY_EMAIL}"
 
-    printf "\nYour work email is used in the .gitconfig for your work repos\n"
+    info "\nYour work email is used in the .gitconfig for your work repos"
     read -r -p "Email (${WORK_EMAIL}): " input
     WORK_EMAIL="${input:-$WORK_EMAIL}"
 
-    printf "\nThe company name will be used to create a subdir under ~/%s\n" "${REPO_DIR}"
+    info "\nThe company name will be used to create a subdir under ~/${REPO_DIR}"
     read -r -p "Company Name (${COMPANY}): " input
     COMPANY=$(echo "${input:-$COMPANY}" | awk '{print tolower($0)}')
 
-    printf "\nDo you want to install the components in Brewfile.home?\n"
+    info "\nDo you want to install the components in Brewfile.home?"
     read -r -p "Install Brewfile.home (${BREW_HOME}): " input
     BREW_HOME=$(echo "${input:-$BREW_HOME}" | awk '{print toupper($0)}')
 
-    printf "\nDo you want to install the components in Brewfile.work?\n"
+    info "\nDo you want to install the components in Brewfile.work?"
     read -r -p "Install Brewfile.work (${BREW_WORK}): " input
     BREW_WORK=$(echo "${input:-$BREW_WORK}" | awk '{print toupper($0)}')
 
@@ -113,19 +113,19 @@ do_git_stuff() {
 
     local personal="${git_root}/personal"
     if ! dir_exists "${personal}"; then
-        echo "Creating ${personal}"
+        info "Creating ${personal}"
         mkdir -p "${personal}"
     fi
 
     local public="${git_root}/public"
     if ! dir_exists "${public}"; then
-        echo "Creating ${public}"
+        info "Creating ${public}"
         mkdir -p "${public}"
     fi
 
     WORK_GIT="${git_root}/${COMPANY}"
     if ! dir_exists "${WORK_GIT}"; then
-        echo "Creating ${WORK_GIT}"
+        info "Creating ${WORK_GIT}"
         mkdir -p "${WORK_GIT}"
     fi
 
@@ -133,6 +133,8 @@ do_git_stuff() {
     export MY_NAME MY_EMAIL WORK_EMAIL WORK_GIT
     envsubst < "${MY_DIR}/git/.gitconfig.global" > "${HOME}/.gitconfig"
     envsubst < "${MY_DIR}/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
+
+    success "Configured git"
 }
 
 do_zsh_stuff() {
@@ -141,7 +143,7 @@ do_zsh_stuff() {
         backup_file "${zshrc}"
     fi
     if ! file_exists "${zshrc}"; then
-        echo "Creating symlink to my .zshrc file"
+        info "Creating symlink for ~/.zshrc"
         ln -s "${MY_DIR}/zsh/.zshrc" "${zshrc}"
     fi
 
@@ -150,9 +152,11 @@ do_zsh_stuff() {
         backup_file "${zshenv}"
     fi
     if ! file_exists "${zshenv}"; then
-        echo "Creating symlink to my .zshenv file"
+        info "Creating symlink for ~/.zshenv"
         ln -s "${MY_DIR}/zsh/.zshenv" "${zshenv}"
     fi
+
+    success "Configured zsh"
 }
 
 do_omz_stuff() {
@@ -161,9 +165,11 @@ do_omz_stuff() {
         backup_file "${theme}"
     fi
     if ! file_exists "${theme}"; then
-        echo "Creating symlink to my oh-my-zsh theme"
+        info "Creating symlink for oh-my-zsh theme"
         ln -s "${MY_DIR}/zsh/jjeffers.zsh-theme" "${theme}"
     fi
+
+    success "Configured oh-my-zsh"
 }
 
 do_aws_stuff() {
@@ -172,20 +178,22 @@ do_aws_stuff() {
         backup_file "${awscfg}"
     fi
     if ! file_exists "${awscfg}"; then
-        echo "Creating symlink to my AWS config file"
+        info "Creating symlink for ~/.aws/config"
         ln -s "${MY_DIR}/aws/config" "${awscfg}"
     fi
+
+    success "Configured awscli"
 }
 
 do_brew_stuff() {
-    printf "\nInstalling Brewfile.base\n\n"
+    info "\nInstalling Brewfile.base"
     brew bundle --file "${MY_DIR}/brew/Brewfile.base"
     if [[ "${BREW_HOME}" == 'Y' ]]; then
-        printf "\n\nInstalling Brewfile.home\n\n"
+        info "\nInstalling Brewfile.home"
         brew bundle --file "${MY_DIR}/brew/Brewfile.home"
     fi
     if [[ "${BREW_WORK}" == 'Y' ]]; then
-        printf "\n\nInstalling Brewfile.work\n\n"
+        info "\nInstalling Brewfile.work"
         brew bundle --file "${MY_DIR}/brew/Brewfile.work"
     fi
 }
@@ -221,6 +229,8 @@ main() {
     do_omz_stuff
     do_aws_stuff
     do_brew_stuff
+
+    success "\nDone!"
 }
 
 main "$@"
