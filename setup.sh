@@ -137,6 +137,19 @@ do_git_stuff() {
     success "Configured git"
 }
 
+do_bash_stuff() {
+    local bashrc=${HOME}/.bashrc
+    if file_exists "${bashrc}" && ! is_symlink "${bashrc}"; then
+        backup_file "${bashrc}"
+    fi
+    if ! file_exists "${bashrc}"; then
+        info "Creating symlink for ~/.bashrc"
+        ln -s -f "${MY_DIR}/bash/.bashrc" "${bashrc}"
+    fi
+
+    success "Configured bash"
+}
+
 do_zsh_stuff() {
     local zshrc=${HOME}/.zshrc
     if file_exists "${zshrc}" && ! is_symlink "${zshrc}"; then
@@ -225,6 +238,7 @@ main() {
 
     echo ""
     do_git_stuff
+    do_bash_stuff
     do_zsh_stuff
     do_omz_stuff
     do_aws_stuff
