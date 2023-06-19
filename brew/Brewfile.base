@@ -4,6 +4,8 @@ brew 'git'
 brew 'httpie'
 brew 'jq'
 brew 'mas'
+brew 'shellcheck'
+brew 'telnet'
 brew 'the_silver_searcher'
 brew 'tig'
 brew 'watch'
@@ -34,6 +36,16 @@ cask 'visual-studio-code'
 cask 'zoom'
 
 # app store
-mas 'CopyClip 2 - Clipboard Manager', id: 1020812363
+mas 'CopyClip', id: 1020812363
 mas 'DaisyDisk', id: 411643860
 mas 'Pixelmator Pro', id: 1289583905
+
+# vscode extensions
+vscode "golang.go"
+vscode "monokai.theme-monokai-pro-vscode"
+vscode "ms-azuretools.vscode-docker"
+vscode "ms-python.python"
+vscode "ms-python.vscode-pylance"
+vscode "ms-vscode-remote.remote-containers"
+vscode "ms-vscode.makefile-tools"
+vscode "timonwong.shellcheck"
