@@ -11,8 +11,6 @@ source $ZSH/oh-my-zsh.sh
 source "/opt/homebrew/opt/kube-ps1/share/kube-ps1.sh"
 
 # Path additions
-# Python
-path+=("$HOME/venvs/python3/bin")
 # Sublime Text
 path+=("/Applications/Sublime Text.app/Contents/SharedSupport/bin")
 # Go

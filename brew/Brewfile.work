@@ -2,7 +2,10 @@
 # so I might not always need it.
 
 brew 'argocd'
+brew 'ansible'
 brew 'awscli'
+brew 'cfn-flip'
+brew 'cfn-lint'
 brew 'helm'
 brew 'hey'
 brew 'kubernetes-cli'
