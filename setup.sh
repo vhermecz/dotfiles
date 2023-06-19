@@ -23,13 +23,15 @@ help() {
 validate_prereqs() {
     # Make sure brew is installed.
     if ! brew --version &> /dev/null; then
-        error "\nInstall brew and try again\n"
+        error "\nCannot find brew!"
+        info "https://brew.sh for install instructions.\n"
         exit 1
     fi
 
     # Make sure oh-my-zsh is installed.
     if ! dir_exists "${HOME}/.oh-my-zsh"; then
-        error "\nInstall oh-my-zsh and try again\n"
+        error "\nCannot find oh-my-zsh!"
+        info "https://ohmyz.sh for install instructions.\n"
         exit 1
     fi
 }
@@ -106,6 +108,18 @@ update_data() {
             brew_home = '${BREW_HOME}',
             brew_work = '${BREW_WORK}'
         WHERE id = 1;"
+}
+
+show_data() {
+    echo -e "\n${C_GRAY}We will use the following data:${C_RESET}\n"
+    echo -e "${C_GRAY}Repo Dir:   ${C_YELLOW}${REPO_DIR}${C_RESET}"
+    echo -e "${C_GRAY}Name:       ${C_YELLOW}${MY_NAME}${C_RESET}"
+    echo -e "${C_GRAY}Email:      ${C_YELLOW}${MY_EMAIL}${C_RESET}"
+    echo -e "${C_GRAY}Work Email: ${C_YELLOW}${WORK_EMAIL}${C_RESET}"
+    echo -e "${C_GRAY}Company:    ${C_YELLOW}${COMPANY}${C_RESET}"
+    echo -e "${C_GRAY}Install Brewfile.home: ${C_YELLOW}${BREW_HOME}${C_RESET}"
+    echo -e "${C_GRAY}Install Brewfile.work: ${C_YELLOW}${BREW_WORK}${C_RESET}"
+    echo -e "\n${C_GRAY}If this looks wrong, run ${C_YELLOW}setup.sh -u${C_GRAY} to update.${C_RESET}"
 }
 
 do_git_stuff() {
@@ -241,10 +255,10 @@ main() {
     fi
 
     load_data
-
     if [[ ${UPDATE} == true ]]; then
         update_data
     fi
+    show_data
 
     echo ""
     do_git_stuff

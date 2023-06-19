@@ -17,9 +17,9 @@ brew 'go'
 brew 'goreleaser'
 
 # python
+brew 'python@3.11'
 brew 'black'
 brew 'pylint'
-brew 'python@3.11'
 brew 'pyyaml'
 
 # apps

@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 
-red="\033[1;31m"
-green="\033[0;32m"
-gray="\033[0;37m"
-reset="\033[m"
+C_GRAY=$(tput setaf 248)
+C_GREEN=$(tput setaf 2)
+C_RED=$(tput setaf 202)
+C_RESET=$(tput sgr0)
+C_YELLOW=$(tput setaf 228)
+export C_GRAY C_GREEN C_RED C_RESET C_YELLOW
 
 error() {
-    echo -e "${red}${1}${reset}" >&2
+    echo -e "${C_RED}${1}${C_RESET}" >&2
 }
 
 success() {
-    echo -e "${green}${1}${reset}"
+    echo -e "${C_GREEN}${1}${C_RESET}"
 }
 
 info() {
-    echo -e "${gray}${1}${reset}"
+    echo -e "${C_GRAY}${1}${C_RESET}"
 }
 
 backup_file() {
