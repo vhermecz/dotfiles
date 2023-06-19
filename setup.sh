@@ -12,11 +12,14 @@ DB="$MY_DIR/dotfiles.db"
 
 # Don't prompt to update user data unless necessary or requested.
 UPDATE=false
+# Don't be verbose unless we request it.
+VERBOSE=false
 
 help() {
-    printf "usage: setup.sh [-h] [-u]\n\n"
+    printf "usage: setup.sh [-huv]\n\n"
     printf "    -h  show this help\n"
     printf "    -u  update user data\n"
+    printf "    -v  verbose output\n"
     exit
 }
 
@@ -241,14 +244,20 @@ do_iterm_stuff() {
 
 do_brew_stuff() {
     info "\nInstalling Brewfile.base"
-    brew bundle --file "${MY_DIR}/brew/Brewfile.base"
+
+    local v=""
+    if $VERBOSE; then
+        v="--verbose";
+    fi
+
+    brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.base"
     if [[ "${BREW_HOME}" == 'Y' ]]; then
         info "\nInstalling Brewfile.home"
-        brew bundle --file "${MY_DIR}/brew/Brewfile.home"
+        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.home"
     fi
     if [[ "${BREW_WORK}" == 'Y' ]]; then
         info "\nInstalling Brewfile.work"
-        brew bundle --file "${MY_DIR}/brew/Brewfile.work"
+        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.work"
     fi
 }
 
@@ -257,9 +266,10 @@ main() {
     source "${MY_DIR}/scripts/helpers.sh"
 
     # Parse arguments.
-    while getopts hu flag; do
+    while getopts huv flag; do
         case "${flag}" in
             u) UPDATE=true;;
+            v) VERBOSE=true;;
             h|*) help;;
         esac
     done
