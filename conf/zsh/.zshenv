@@ -22,3 +22,22 @@ git-pull-dirs() {
         cd ..
     done
 }
+
+# Gets a list of tags from Docker Hub
+# TODO: This gets a max of 100 tags back, so it could be missing data.
+dockerhub-tags() {
+    if ! [[ "$#" -eq 2 || "$#" -eq 3 ]]; then
+        printf "ERROR: missing required args\n\n"
+        printf "usage: dockerhub-tags repo_name image_name <filter>\n\n"
+        printf "   repo_name    required   ex. 'apache' (use 'library' for images w/no prefix)\n"
+        printf "   image_name   required   ex. 'airflow'\n"
+        printf "   filter       optional   ex. 'python-3'\n"
+        return 1
+    fi
+
+    if [[ -z "$3" ]]; then
+        curl -s "https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page_size=100" | jq -r '.results[].name'
+    else
+        curl -s "https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page_size=100" | jq -r '.results[].name' | grep -i "${3}"
+    fi
+}

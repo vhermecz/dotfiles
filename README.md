@@ -73,7 +73,7 @@ If the files being replaced already exist, the script will make a backup.
 ### Other Configuration
 
 * Configure iTerm2 to use the preferences file in this repo
-* Contains a python requirements file (not currently used)
+* Create a virtual env for the python installed by brew
 
 ### Install Software with Brew
 

@@ -125,34 +125,6 @@ show_data() {
     echo -e "\n${C_GRAY}If this looks wrong, run ${C_YELLOW}setup.sh -u${C_GRAY} to update.${C_RESET}"
 }
 
-do_git_stuff() {
-    local git_root=${HOME}/${REPO_DIR}
-
-    # Create the git repo directories if they don't exist.
-    local personal="${git_root}/personal"
-    if ! dir_exists "${personal}"; then
-        info "Creating ${personal}"
-        mkdir -p "${personal}"
-    fi
-    local public="${git_root}/public"
-    if ! dir_exists "${public}"; then
-        info "Creating ${public}"
-        mkdir -p "${public}"
-    fi
-    WORK_GIT="${git_root}/${COMPANY}"
-    if ! dir_exists "${WORK_GIT}"; then
-        info "Creating ${WORK_GIT}"
-        mkdir -p "${WORK_GIT}"
-    fi
-
-    # Some vars need to be exported to work with envsubst.
-    export MY_NAME MY_EMAIL WORK_EMAIL WORK_GIT
-    envsubst < "${MY_DIR}/conf/git/.gitconfig.global" > "${HOME}/.gitconfig"
-    envsubst < "${MY_DIR}/conf/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
-
-    success "Configured git"
-}
-
 do_bash_stuff() {
     local bashrc=${HOME}/.bashrc
     # Backup the existing .bashrc if necessary.
@@ -209,6 +181,24 @@ do_omz_stuff() {
     success "Configured oh-my-zsh"
 }
 
+do_brew_stuff() {
+    local v=""
+    if $VERBOSE; then
+        v="--verbose";
+    fi
+
+    info "Installing Brewfile.base"
+    brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.base"
+    if [[ "${BREW_HOME}" == 'Y' ]]; then
+        info "\nInstalling Brewfile.home"
+        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.home"
+    fi
+    if [[ "${BREW_WORK}" == 'Y' ]]; then
+        info "\nInstalling Brewfile.work"
+        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.work"
+    fi
+}
+
 do_aws_stuff() {
     local awsdir=${HOME}/.aws
     # Create ~/.aws if it doesn't exist.
@@ -231,32 +221,69 @@ do_aws_stuff() {
     success "Configured awscli"
 }
 
+do_git_stuff() {
+    local git_root=${HOME}/${REPO_DIR}
+
+    # Create the git repo directories if they don't exist.
+    local personal="${git_root}/personal"
+    if ! dir_exists "${personal}"; then
+        info "Creating ${personal}"
+        mkdir -p "${personal}"
+    fi
+    local public="${git_root}/public"
+    if ! dir_exists "${public}"; then
+        info "Creating ${public}"
+        mkdir -p "${public}"
+    fi
+    WORK_GIT="${git_root}/${COMPANY}"
+    if ! dir_exists "${WORK_GIT}"; then
+        info "Creating ${WORK_GIT}"
+        mkdir -p "${WORK_GIT}"
+    fi
+
+    # Some vars need to be exported to work with envsubst.
+    export MY_NAME MY_EMAIL WORK_EMAIL WORK_GIT
+    envsubst < "${MY_DIR}/conf/git/.gitconfig.global" > "${HOME}/.gitconfig"
+    envsubst < "${MY_DIR}/conf/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
+
+    success "Configured git"
+}
+
 do_iterm_stuff() {
     # Configure iTerm to use our preferences file.
     if dir_exists "/Applications/iTerm.app"; then
         defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$MY_DIR/conf/iterm"
         defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
-        success "Configured iTerm"
+        success "Configured iterm"
     else
-        error "Cannot find iTerm!"
+        error "Cannot find iterm!"
     fi
 }
 
-do_brew_stuff() {
-    local v=""
-    if $VERBOSE; then
-        v="--verbose";
+do_python_stuff() {
+    local q=""
+    if ! $VERBOSE; then
+        q="-q";
     fi
 
-    info "\nInstalling Brewfile.base"
-    brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.base"
-    if [[ "${BREW_HOME}" == 'Y' ]]; then
-        info "\nInstalling Brewfile.home"
-        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.home"
-    fi
-    if [[ "${BREW_WORK}" == 'Y' ]]; then
-        info "\nInstalling Brewfile.work"
-        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.work"
+    # Create a python3 venv
+    if python3 --version &> /dev/null; then
+        if ! dir_exists "${HOME}/venvs/python3"; then
+            info "Creating python virtual env"
+            mkdir -p "${HOME}/venvs/python3"
+            python3 -m venv "${HOME}/venvs/python3"
+        fi
+        if dir_exists "${HOME}/venvs/python3"; then
+            info "Updating python virtual env"
+            # shellcheck disable=SC1091
+            source "${HOME}/venvs/python3/bin/activate"
+            pip install ${q} -U pip
+            pip install ${q} -U -r "${MY_DIR}/conf/python/requirements.txt"
+            deactivate
+        fi
+        success "Configured python"
+    else
+        error "Cannot find python!"
     fi
 }
 
@@ -288,14 +315,20 @@ main() {
     fi
     show_data
 
+    # Configure shells
     echo ""
-    do_git_stuff
     do_bash_stuff
     do_zsh_stuff
     do_omz_stuff
-    do_aws_stuff
-    do_iterm_stuff
+    # Install apps
+    echo ""
     do_brew_stuff
+    # Configure apps
+    echo ""
+    do_aws_stuff
+    do_git_stuff
+    do_iterm_stuff
+    do_python_stuff
 
     success "\nDone!"
 }
