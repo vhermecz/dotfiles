@@ -2,7 +2,13 @@
 
 Just some stuff to save me setup time when configuring a new mac.
 
-This is very specific to my setup, and my way of doing things. I wouldn't recommend using it as-is, but it might be a good starting place to create your own custom scripts.
+## Caveats
+
+⚠️ **This is highly customized for me.** It might be a good place to get ideas for your own scripts, though.
+
+⚠️ **This is not going to be right for you as-is.** The software and config files it installs are unlikely to be what you want or need, unless you work at the same company as me. And even then, it won't be exactly right.
+
+⚠️ **This has only been tested on MacOS.** Some of this will probably work on Linux or Windows, but I don't know.
 
 ## Prerequisites
 
@@ -18,24 +24,25 @@ This is very specific to my setup, and my way of doing things. I wouldn't recomm
     ```
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     ```
-1. Log in to the App Store. Some of the things I'm installing with brew use the [mas](https://formulae.brew.sh/formula/mas) command.
+1. Log in to the Mac App Store. This is needed because some software is installed with [brew mas](https://formulae.brew.sh/formula/mas).
 
 ## Instructions
 
-1. Clone the repo, which you should be able to do because you installed Git in the prerequisite steps.
-2. Run `./setup.sh`
+Run `./setup.sh`
+
+On the initial run, you'll be asked some setup questions. The answers will be saved in a sqlite database for future runs.
+
+💾 To update saved user data, run `./setup.sh -u`
+
+🗣️ To enable verbose mode, run `./setup.sh -v`
 
 ## How it Works
 
-The main purpose of the script is to save some of the tedious steps required when setting up a new machine. One of the nice side-effects is that it's also a single command you can run to update things. Since everything is installed with `brew`, you can rerun the script at any time to update all the software that was installed with `brew`.
-
-When you first run the script, it'll create an extremely simple sqlite database to store some user data. It uses this data primarily to configure git.
-
-You'll be prompted to customize this user data on the initial run, and you can update it any time by running `setup.sh -u`.
+The script installs and configures software automatically, so I don't have to do it manually. It handles configuration primarily with symlinks to files saved in this repo, and installs and updates software using `brew`.
 
 ### Git Configuration
 
-I like to drop all of my git repos into a top-level folder just under `$HOME`. I create subdirs there for public repos, personal projects, and work repos. I'll end up with something like this:
+The script creates directories and `.gitconfig` files under `$HOME` that will look something like this:
 
 ```
 $HOME
@@ -47,14 +54,33 @@ $HOME
       └─ .gitconfig  <-- work-specific .gitconfig
 ```
 
-The separate `.gitconfig` files allow me to use my personal email in the global config, but use a different email address for commits to my work repos. See the script for details on how this is done.
+The global `.gitconfig` uses my personal email.
 
-### Symlinks to Dotfiles
+The work-specific `.gitconfig` uses my work email, so commits to repos in that directory do not use my personal email.
 
-Next, it'll drop symlinks to various dotfiles to configure `zsh`, `oh-my-zsh`, and `awscli`. If the files it's replacing already exist, it'll make a backup copy first.
+### Dotfile Symlinks
+
+The script will create symlinks to dotfiles that configure various programs. Currently, this includes:
+
+* `~/.bashrc`
+* `~/.zshrc`
+* `~/.zshenv`
+* `~/.aws/config`
+* oh-my-zsh theme
+
+If the files being replaced already exist, the script will make a backup.
+
+### Other Configuration
+
+* Configure iTerm2 to use the preferences file in this repo
+* Contains a python requirements file (not currently used)
 
 ### Install Software with Brew
 
-Finally, it'll install all the software in the various Brewfiles.
+After config files are created, the script installs the software in the Brewfiles.
 
-I have the Brewfiles split up into `base`, `home`, and `work`. The `base` Brewfile is always installed, while the others are conditional based on your answers to the setup questions.
+The Brewfiles are split into `base`, `home`, and `work`. The `base` Brewfile is always installed, while the others are conditional based on answers to the setup questions.
+
+### Software Updates
+
+A nice side-effect of using `brew` to install everything is that you can use this script to update software. Just re-run the script and everything that was installed with `brew` will be updated.
