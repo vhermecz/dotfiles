@@ -234,7 +234,7 @@ do_aws_stuff() {
 do_iterm_stuff() {
     # Configure iTerm to use our preferences file.
     if dir_exists "/Applications/iTerm.app"; then
-        defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$MY_DIR/iterm"
+        defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$MY_DIR/conf/iterm"
         defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
         success "Configured iTerm"
     else
