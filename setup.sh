@@ -147,8 +147,8 @@ do_git_stuff() {
 
     # Some vars need to be exported to work with envsubst.
     export MY_NAME MY_EMAIL WORK_EMAIL WORK_GIT
-    envsubst < "${MY_DIR}/git/.gitconfig.global" > "${HOME}/.gitconfig"
-    envsubst < "${MY_DIR}/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
+    envsubst < "${MY_DIR}/conf/git/.gitconfig.global" > "${HOME}/.gitconfig"
+    envsubst < "${MY_DIR}/conf/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
 
     success "Configured git"
 }
@@ -162,7 +162,7 @@ do_bash_stuff() {
     # Create symlink to our .bashrc file.
     if ! file_exists "${bashrc}"; then
         info "Creating symlink for ~/.bashrc"
-        ln -s -f "${MY_DIR}/bash/.bashrc" "${bashrc}"
+        ln -s -f "${MY_DIR}/conf/bash/.bashrc" "${bashrc}"
     fi
 
     success "Configured bash"
@@ -177,7 +177,7 @@ do_zsh_stuff() {
     # Create symlink to our .zshrc file.
     if ! file_exists "${zshrc}"; then
         info "Creating symlink for ~/.zshrc"
-        ln -s -f "${MY_DIR}/zsh/.zshrc" "${zshrc}"
+        ln -s -f "${MY_DIR}/conf/zsh/.zshrc" "${zshrc}"
     fi
 
     local zshenv=${HOME}/.zshenv
@@ -188,7 +188,7 @@ do_zsh_stuff() {
     # Create symlink to our .zshenv file.
     if ! file_exists "${zshenv}"; then
         info "Creating symlink for ~/.zshenv"
-        ln -s -f "${MY_DIR}/zsh/.zshenv" "${zshenv}"
+        ln -s -f "${MY_DIR}/conf/zsh/.zshenv" "${zshenv}"
     fi
 
     success "Configured zsh"
@@ -203,7 +203,7 @@ do_omz_stuff() {
     # Create symlink to our theme.
     if ! file_exists "${theme}"; then
         info "Creating symlink for oh-my-zsh theme"
-        ln -s -f "${MY_DIR}/zsh/jjeffers.zsh-theme" "${theme}"
+        ln -s -f "${MY_DIR}/conf/zsh/jjeffers.zsh-theme" "${theme}"
     fi
 
     success "Configured oh-my-zsh"
@@ -225,7 +225,7 @@ do_aws_stuff() {
     # Create symlink to our config.
     if ! file_exists "${awscfg}"; then
         info "Creating symlink for ~/.aws/config"
-        ln -s -f "${MY_DIR}/aws/config" "${awscfg}"
+        ln -s -f "${MY_DIR}/conf/aws/config" "${awscfg}"
     fi
 
     success "Configured awscli"
@@ -243,13 +243,12 @@ do_iterm_stuff() {
 }
 
 do_brew_stuff() {
-    info "\nInstalling Brewfile.base"
-
     local v=""
     if $VERBOSE; then
         v="--verbose";
     fi
 
+    info "\nInstalling Brewfile.base"
     brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.base"
     if [[ "${BREW_HOME}" == 'Y' ]]; then
         info "\nInstalling Brewfile.home"
