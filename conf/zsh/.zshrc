@@ -29,6 +29,8 @@ alias kns="kubens"
 # AWS aliases
 SSO_PROFILE=airdna-dev
 alias ssologin="aws sso login --profile $SSO_PROFILE"
+alias catoken="aws codeartifact get-authorization-token --profile airdna-dev --domain airdna-svc --domain-owner 537022569116 --query authorizationToken --output text"
 alias ecrlogin="aws ecr get-login-password --profile $SSO_PROFILE | docker login --username AWS --password-stdin 537022569116.dkr.ecr.us-east-1.amazonaws.com"
 alias npmlogin="aws codeartifact login --profile $SSO_PROFILE --tool npm --repository npm --domain airdna-svc --domain-owner 537022569116"
+alias pypiurl="export PYPI_URL=https://aws:$(catoken)@airdna-svc-537022569116.d.codeartifact.us-east-1.amazonaws.com/pypi/pypi/simple/"
 alias pypilogin="aws codeartifact login --profile $SSO_PROFILE --tool pip --repository pypi --domain airdna-svc --domain-owner 537022569116"
