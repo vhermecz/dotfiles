@@ -7,21 +7,11 @@ C_RESET=$(tput sgr0)
 C_YELLOW=$(tput setaf 228)
 export C_GRAY C_GREEN C_RED C_RESET C_YELLOW
 
-error() {
-    echo -e "${C_RED}${1}${C_RESET}" >&2
-}
+error()   { echo -e "${C_RED}${1}${C_RESET}" >&2; }
+success() { echo -e "${C_GREEN}${1}${C_RESET}"; }
+info()    { echo -e "${C_GRAY}${1}${C_RESET}"; }
 
-success() {
-    echo -e "${C_GREEN}${1}${C_RESET}"
-}
-
-info() {
-    echo -e "${C_GRAY}${1}${C_RESET}"
-}
-
-backup_file() {
-    mv "${1}" "${1}.$(date '+%Y%m%d%H%M%S')"
-}
+backup_file() { mv "${1}" "${1}.$(date '+%Y%m%d%H%M%S')"; }
 
 dir_exists() {
     if [[ -d "${1}" ]]; then

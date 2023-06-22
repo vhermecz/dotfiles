@@ -197,6 +197,9 @@ do_brew_stuff() {
         info "\nInstalling Brewfile.work"
         brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.work"
     fi
+
+    info "\nUpdating brew casks"
+    brew cu --all
 }
 
 do_aws_stuff() {
@@ -277,8 +280,10 @@ do_python_stuff() {
             info "Updating python virtual env"
             # shellcheck disable=SC1091
             source "${HOME}/venvs/python3/bin/activate"
-            pip install ${q} -U pip
-            pip install ${q} -U -r "${MY_DIR}/conf/python/requirements.txt"
+            # I'm only installing public packages, so always use pypi.org for pip installs.
+            # This overrides any local config that might be pointed at a private repo.
+            pip install ${q} -U --index-url https://pypi.org/simple pip
+            pip install ${q} -U --index-url https://pypi.org/simple -r "${MY_DIR}/conf/python/requirements.txt"
             deactivate
         fi
         success "Configured python"

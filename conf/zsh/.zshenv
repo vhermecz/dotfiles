@@ -23,6 +23,13 @@ git-pull-dirs() {
     done
 }
 
+# Completely removes all containers, images, and builder cache files.
+docker-purge() {
+    docker container prune -f
+    docker image prune -f -a
+    docker builder prune -f
+}
+
 # Gets a list of tags from Docker Hub
 # TODO: This gets a max of 100 tags back, so it could be missing data.
 dockerhub-tags() {

@@ -1,5 +1,7 @@
 # Stuff I want installed everywhere.
 
+tap "buo/cask-upgrade"
+
 brew 'git'
 brew 'httpie'
 brew 'jq'
