@@ -167,7 +167,7 @@ do_zsh_stuff() {
 }
 
 do_omz_stuff() {
-    local theme=${HOME}/.oh-my-zsh/themes/jjeffers.zsh-theme
+    local theme=${HOME}/.oh-my-zsh/themes/my.zsh-theme
     # Backup the existing theme if necessary.
     if file_exists "${theme}" && ! is_symlink "${theme}"; then
         backup_file "${theme}"
@@ -175,7 +175,7 @@ do_omz_stuff() {
     # Create symlink to our theme.
     if ! file_exists "${theme}"; then
         info "Creating symlink for oh-my-zsh theme"
-        ln -s -f "${MY_DIR}/conf/zsh/jjeffers.zsh-theme" "${theme}"
+        ln -s -f "${MY_DIR}/conf/zsh/my.zsh-theme" "${theme}"
     fi
 
     success "Configured oh-my-zsh"
