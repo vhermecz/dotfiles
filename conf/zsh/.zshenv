@@ -31,7 +31,6 @@ docker-purge() {
 }
 
 # Gets a list of tags from Docker Hub
-# TODO: This gets a max of 100 tags back, so it could be missing data.
 dockerhub-tags() {
     if ! [[ "$#" -eq 2 || "$#" -eq 3 ]]; then
         printf "ERROR: missing required args\n\n"
@@ -42,9 +41,24 @@ dockerhub-tags() {
         return 1
     fi
 
-    if [[ -z "$3" ]]; then
-        curl -s "https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page_size=100" | jq -r '.results[].name'
-    else
-        curl -s "https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page_size=100" | jq -r '.results[].name' | grep -i "${3}"
+    # Get count of results
+    local count size pages remainder url
+    size=100
+    count=$(curl -s "https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page_size=${size}" | jq -r '.count')
+    pages=$(expr $count / $size)
+    remainder=$(expr $count % $size)
+    if [[ $remainder > 0 ]]; then
+        pages=$(expr $pages + 1)
     fi
+
+    echo "Fetching ${size} items per page for ${pages} pages..."
+    for page in {1..$pages}
+    do
+        url="https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page=${page}"
+        if [[ -z "$3" ]]; then
+            curl -s "${url}" | jq -r '.results[].name'
+        else
+            curl -s "${url}" | jq -r '.results[].name' | grep -i "${3}"
+        fi
+    done
 }
