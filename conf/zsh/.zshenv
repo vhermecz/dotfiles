@@ -1,17 +1,19 @@
+#!/usr/bin/env bash
+
 # Does a git pull for every subdir in a directory.
 # Handy for making sure a bunch of repos are up-to-date with one command.
 git-pull-dirs() {
     # Get all directories. This is not recursive, so we only go one level deep.
     for d in */ ; do
         # Change to the current dir.
-        cd "$d"
+        cd "$d" || return
         echo ""
         echo "checking $d..."
         # If there's a .git directory in here, this is a repo, so...
         if [[ -d ".git" ]]; then
             # ...switch to main if we're not already using it...
             if [[ $(git branch --show-current) != $(git_main_branch) ]]; then
-                git switch $(git_main_branch)
+                git switch "$(git_main_branch)"
             fi
             # ...then pull everything.
             git pull --all
@@ -19,7 +21,7 @@ git-pull-dirs() {
             echo "$d is not a git repo"
         fi
         # CD up one level so we can do it again for the next dir.
-        cd ..
+        cd .. || return
     done
 }
 
@@ -45,14 +47,14 @@ dockerhub-tags() {
     local count size pages remainder url
     size=100
     count=$(curl -s "https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page_size=${size}" | jq -r '.count')
-    pages=$(expr $count / $size)
-    remainder=$(expr $count % $size)
-    if [[ $remainder > 0 ]]; then
-        pages=$(expr $pages + 1)
+    pages=$((count / size))
+    remainder=$((count % size))
+    if [[ $remainder -gt 0 ]]; then
+        pages=$((pages + 1))
     fi
 
     echo "Fetching ${size} items per page for ${pages} pages..."
-    for page in {1..$pages}
+    for ((page=1; page <= pages; page++))
     do
         url="https://hub.docker.com/v2/namespaces/${1}/repositories/${2}/tags?page=${page}"
         if [[ -z "$3" ]]; then
@@ -61,4 +63,29 @@ dockerhub-tags() {
             curl -s "${url}" | jq -r '.results[].name' | grep -i "${3}"
         fi
     done
+}
+
+# Deletes empty namespaces.
+# Requires one arg, which is the prefix start string.
+kns-cleanup() {
+    if [[ $# -eq 0 ]]; then
+        echo "namespace prefix filter is required"
+        return
+    fi
+
+    ns=()
+    while IFS='' read -r line; do ns+=("$line"); done < <(kubectl get ns --no-headers -o custom-columns=":metadata.name" | grep "^$1")
+
+    if [[ "${#ns[@]}" -eq 0 ]]; then
+        echo "No namespaces found with filter \"${1}\""
+        return
+    else
+        echo "Looking for empty namespaces..."
+        for n in "${ns[@]}" ; do
+            if ! [[ "$(kubectl get deployment -n "${n}" -o name)" ]]; then
+                echo "Deleting: ${n}"
+                kubectl delete ns "${n}"
+            fi
+        done
+    fi
 }
