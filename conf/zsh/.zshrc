@@ -1,6 +1,6 @@
 # oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="jjeffers"
+ZSH_THEME="my"
 plugins=(docker git kubectl)
 
 # brew shell completion -- must be called before oh-my-zsh
@@ -8,7 +8,7 @@ plugins=(docker git kubectl)
 FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
 source $ZSH/oh-my-zsh.sh
-source "/opt/homebrew/opt/kube-ps1/share/kube-ps1.sh"
+source /opt/homebrew/opt/kube-ps1/share/kube-ps1.sh
 
 # Path additions
 # Sublime Text
