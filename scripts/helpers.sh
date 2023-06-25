@@ -14,25 +14,13 @@ info()    { echo -e "${C_GRAY}${1}${C_RESET}"; }
 backup_file() { mv "${1}" "${1}.$(date '+%Y%m%d%H%M%S')"; }
 
 dir_exists() {
-    if [[ -d "${1}" ]]; then
-        return 0
-    else
-        return 1
-    fi
+    if ! [[ -d "${1}" ]]; then return 1; fi
 }
 
 file_exists() {
-    if [[ -f "${1}" ]]; then
-        return 0
-    else
-        return 1
-    fi
+    if ! [[ -f "${1}" ]]; then return 1; fi
 }
 
 is_symlink() {
-    if [[ -L "${1}" ]]; then
-        return 0
-    else
-        return 1
-    fi
+    if ! [[ -L "${1}" ]]; then return 1; fi
 }
