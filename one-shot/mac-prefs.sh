@@ -1,12 +1,57 @@
 #!/usr/bin/env bash
 
+# HOT TIP: You can use plistwatch to determine which setting is
+# being updated when you modify something in System Settings.
+# https://github.com/catilac/plistwatch
+
+# Get the sudo password because we'll need it later.
+echo "Enter your sudo password."
+sudo -v
+
 # Close System Preferences to make sure it doesn't interfere.
 osascript -e 'tell application "System Preferences" to quit'
+
+### Network
+###########################################################
+# Enable firewall
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+
+### General -> Sharing
+###########################################################
+# Get and set the hostname.
+read -r -p "Hostname: " hostname
+# Name shown in Settings -> General -> Sharing
+sudo scutil --set ComputerName "${hostname}"
+# Name shown by the hostname command
+sudo scutil --set HostName "${hostname}"
+# Bonjour hostname ending in .local
+sudo scutil --set LocalHostName "${hostname}"
 
 ### Appearance
 ###########################################################
 # Set sidebar icon size to small.
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
+
+### Control Center
+###########################################################
+# Always show the sound icon in the menu bar.
+defaults write com.apple.controlcenter "NSStatusItem Visible Sound" -bool true
+
+### Desktop & Dock
+###########################################################
+# Dock icon size.
+defaults write com.apple.dock tilesize -int 40
+# Dock position.
+defaults write com.apple.dock orientation -string left
+# Don't show recent apps.
+defaults write com.apple.dock show-recents -bool FALSE
+# Remove all apps from the Dock.
+defaults write com.apple.dock persistent-apps -array
+
+### Mouse & Trackpad
+###########################################################
+# Disable natural scrolling.
+defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 
 ### Finder
 ###########################################################
@@ -49,21 +94,7 @@ defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false
 /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 64" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 64" ~/Library/Preferences/com.apple.finder.plist
 
-### Desktop & Dock
+### Restart things that need to be restarted.
 ###########################################################
-# Dock icon size.
-defaults write com.apple.dock tilesize -int 40
-# Dock position.
-defaults write com.apple.dock orientation -string left
-# Don't show recent apps.
-defaults write com.apple.dock show-recents -bool FALSE
-# Remove all apps from the Dock.
-defaults write com.apple.dock persistent-apps -array
-
-### Mouse & Trackpad
-###########################################################
-# Disable natural scrolling.
-defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
-
 killall Finder
 killall Dock
