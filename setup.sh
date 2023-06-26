@@ -4,16 +4,8 @@ set -o nounset
 set -o pipefail
 
 # Get the path this script lives in so it'll work if called from another directory.
-MY_DIR=$(cd -- "$(dirname "$0")" >/dev/null 2>&1; pwd -P)
-cd "${MY_DIR}"
-
-# Path to the sqlite database that stores user data.
-DB="$MY_DIR/dotfiles.db"
-
-# Don't prompt to update user data unless necessary or requested.
-UPDATE=false
-# Don't be verbose unless we request it.
-VERBOSE=false
+my_dir=$(cd -- "$(dirname "$0")" >/dev/null 2>&1; pwd -P)
+cd "${my_dir}"
 
 help() {
     printf "usage: setup.sh [-huv]\n\n"
@@ -42,7 +34,7 @@ validate_prereqs() {
 # Create and populate the DB with example data.
 create_db() {
     info "\nCreating database"
-    sqlite3 "${DB}" "
+    sqlite3 "${db}" "
         CREATE TABLE userdata (
             id INTEGER,
             repo_dir TEXT,
@@ -52,20 +44,20 @@ create_db() {
             company TEXT,
             brew_home TEXT,
             brew_work TEXT);"
-    sqlite3 "${DB}" "
+    sqlite3 "${db}" "
         INSERT INTO userdata (id, repo_dir, my_name, my_email, work_email, company, brew_home, brew_work)
         VALUES (1, 'git', 'My Name', 'my@email', 'work@email', 'company-name', 'N', 'N');"
 }
 
 # Load user data from the DB
 load_data() {
-    REPO_DIR="$(sqlite3 "${DB}"   "SELECT repo_dir FROM userdata WHERE id = 1;")"
-    MY_NAME="$(sqlite3 "${DB}"    "SELECT my_name FROM userdata WHERE id = 1;")"
-    MY_EMAIL="$(sqlite3 "${DB}"   "SELECT my_email FROM userdata WHERE id = 1;")"
-    WORK_EMAIL="$(sqlite3 "${DB}" "SELECT work_email FROM userdata WHERE id = 1;")"
-    COMPANY="$(sqlite3 "${DB}"    "SELECT company FROM userdata WHERE id = 1;")"
-    BREW_HOME="$(sqlite3 "${DB}"  "SELECT brew_home FROM userdata WHERE id = 1;")"
-    BREW_WORK="$(sqlite3 "${DB}"  "SELECT brew_work FROM userdata WHERE id = 1;")"
+    REPO_DIR="$(sqlite3 "${db}"   "SELECT repo_dir FROM userdata WHERE id = 1;")"
+    MY_NAME="$(sqlite3 "${db}"    "SELECT my_name FROM userdata WHERE id = 1;")"
+    MY_EMAIL="$(sqlite3 "${db}"   "SELECT my_email FROM userdata WHERE id = 1;")"
+    WORK_EMAIL="$(sqlite3 "${db}" "SELECT work_email FROM userdata WHERE id = 1;")"
+    COMPANY="$(sqlite3 "${db}"    "SELECT company FROM userdata WHERE id = 1;")"
+    BREW_HOME="$(sqlite3 "${db}"  "SELECT brew_home FROM userdata WHERE id = 1;")"
+    BREW_WORK="$(sqlite3 "${db}"  "SELECT brew_work FROM userdata WHERE id = 1;")"
 }
 
 # Prompt to update user data.
@@ -101,7 +93,7 @@ update_data() {
     BREW_WORK=$(echo "${input:-$BREW_WORK}" | awk '{print toupper($0)}')
 
     # Update the DB with the data we just collected.
-    sqlite3 "${DB}" "
+    sqlite3 "${db}" "
         UPDATE userdata SET
             repo_dir = '${REPO_DIR}',
             my_name = '${MY_NAME}',
@@ -134,7 +126,7 @@ do_bash_stuff() {
     # Create symlink to our .bashrc file.
     if ! file_exists "${bashrc}"; then
         info "Creating symlink for ~/.bashrc"
-        ln -s -f "${MY_DIR}/conf/bash/.bashrc" "${bashrc}"
+        ln -s -f "${my_dir}/conf/bash/.bashrc" "${bashrc}"
     fi
 
     success "Configured bash"
@@ -149,7 +141,7 @@ do_zsh_stuff() {
     # Create symlink to our .zshrc file.
     if ! file_exists "${zshrc}"; then
         info "Creating symlink for ~/.zshrc"
-        ln -s -f "${MY_DIR}/conf/zsh/.zshrc" "${zshrc}"
+        ln -s -f "${my_dir}/conf/zsh/.zshrc" "${zshrc}"
     fi
 
     local zshenv=${HOME}/.zshenv
@@ -160,7 +152,7 @@ do_zsh_stuff() {
     # Create symlink to our .zshenv file.
     if ! file_exists "${zshenv}"; then
         info "Creating symlink for ~/.zshenv"
-        ln -s -f "${MY_DIR}/conf/zsh/.zshenv" "${zshenv}"
+        ln -s -f "${my_dir}/conf/zsh/.zshenv" "${zshenv}"
     fi
 
     success "Configured zsh"
@@ -175,7 +167,7 @@ do_omz_stuff() {
     # Create symlink to our theme.
     if ! file_exists "${theme}"; then
         info "Creating symlink for oh-my-zsh theme"
-        ln -s -f "${MY_DIR}/conf/zsh/my.zsh-theme" "${theme}"
+        ln -s -f "${my_dir}/conf/zsh/my.zsh-theme" "${theme}"
     fi
 
     success "Configured oh-my-zsh"
@@ -183,19 +175,19 @@ do_omz_stuff() {
 
 do_brew_stuff() {
     local v=""
-    if $VERBOSE; then
+    if [[ ${verbose} = true ]]; then
         v="--verbose";
     fi
 
     info "Installing Brewfile.base"
-    brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.base"
+    brew bundle "${v}" --file "${my_dir}/brew/Brewfile.base"
     if [[ "${BREW_HOME}" == 'Y' ]]; then
         info "\nInstalling Brewfile.home"
-        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.home"
+        brew bundle "${v}" --file "${my_dir}/brew/Brewfile.home"
     fi
     if [[ "${BREW_WORK}" == 'Y' ]]; then
         info "\nInstalling Brewfile.work"
-        brew bundle "${v}" --file "${MY_DIR}/brew/Brewfile.work"
+        brew bundle "${v}" --file "${my_dir}/brew/Brewfile.work"
     fi
 
     info "\nUpdating brew casks"
@@ -218,7 +210,7 @@ do_aws_stuff() {
     # Create symlink to our config.
     if ! file_exists "${awscfg}"; then
         info "Creating symlink for ~/.aws/config"
-        ln -s -f "${MY_DIR}/conf/aws/config" "${awscfg}"
+        ln -s -f "${my_dir}/conf/aws/config" "${awscfg}"
     fi
 
     success "Configured awscli"
@@ -246,8 +238,8 @@ do_git_stuff() {
 
     # Some vars need to be exported to work with envsubst.
     export MY_NAME MY_EMAIL WORK_EMAIL WORK_GIT
-    envsubst < "${MY_DIR}/conf/git/.gitconfig.global" > "${HOME}/.gitconfig"
-    envsubst < "${MY_DIR}/conf/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
+    envsubst < "${my_dir}/conf/git/.gitconfig.global" > "${HOME}/.gitconfig"
+    envsubst < "${my_dir}/conf/git/.gitconfig.work" > "${WORK_GIT}/.gitconfig"
 
     success "Configured git"
 }
@@ -255,7 +247,7 @@ do_git_stuff() {
 do_iterm_stuff() {
     # Configure iTerm to use our preferences file.
     if dir_exists "/Applications/iTerm.app"; then
-        defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$MY_DIR/conf/iterm"
+        defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$my_dir/conf/iterm"
         defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
         success "Configured iterm"
     else
@@ -264,11 +256,6 @@ do_iterm_stuff() {
 }
 
 do_python_stuff() {
-    local q=""
-    if ! $VERBOSE; then
-        q="-q";
-    fi
-
     # Create a python3 venv
     if python3 --version &> /dev/null; then
         if ! dir_exists "${HOME}/venvs/python3"; then
@@ -282,8 +269,14 @@ do_python_stuff() {
             source "${HOME}/venvs/python3/bin/activate"
             # I'm only installing public packages, so always use pypi.org for pip installs.
             # This overrides any local config that might be pointed at a private repo.
-            pip install ${q} -U --index-url https://pypi.org/simple pip
-            pip install ${q} -U --index-url https://pypi.org/simple -r "${MY_DIR}/conf/python/requirements.txt"
+            if [[ "${verbose}" = true ]]; then
+                pip install -U --index-url https://pypi.org/simple pip
+                pip install -U --index-url https://pypi.org/simple -r "${my_dir}/conf/python/requirements.txt"
+            else
+                # Pipe pip to grep to suppress output if there are no updates.
+                pip install -U --index-url https://pypi.org/simple pip | { grep -v 'Requirement already satisfied' || true; }
+                pip install -U --index-url https://pypi.org/simple -r "${my_dir}/conf/python/requirements.txt" | { grep -v 'Requirement already satisfied' || true; }
+            fi
             deactivate
         fi
         success "Configured python"
@@ -294,13 +287,19 @@ do_python_stuff() {
 
 main() {
     # shellcheck disable=SC1091
-    source "${MY_DIR}/scripts/helpers.sh"
+    source "${my_dir}/scripts/helpers.sh"
+
+    # Path to the sqlite database that stores user data.
+    db="$my_dir/dotfiles.db"
+    # Preference args defaults.
+    update=false   # update user data
+    verbose=false  # verbosity
 
     # Parse arguments.
     while getopts huv flag; do
         case "${flag}" in
-            u) UPDATE=true;;
-            v) VERBOSE=true;;
+            u) update=true;;
+            v) verbose=true;;
             h|*) help;;
         esac
     done
@@ -308,14 +307,14 @@ main() {
     validate_prereqs
 
     # Create the database if necessary.
-    if ! file_exists "$DB"; then
+    if ! file_exists "${db}"; then
         create_db
         # If we have to create the database, prompt the user to update.
-        UPDATE=true
+        update=true
     fi
 
     load_data
-    if [[ ${UPDATE} == true ]]; then
+    if [[ ${update} == true ]]; then
         update_data
     fi
     show_data
