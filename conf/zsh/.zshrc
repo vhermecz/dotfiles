@@ -18,6 +18,7 @@ export GOPATH=$HOME/go
 path+=("$HOME/go/bin")
 # Python
 path+=("$HOME/venvs/python3/bin")
+path+=("/opt/homebrew/opt/postgresql@15/bin")
 # Linkerd
 path+=($HOME/.linkerd2/bin)
 export PATH
