@@ -144,15 +144,15 @@ do_zsh_stuff() {
         ln -s -f "${my_dir}/conf/zsh/.zshrc" "${zshrc}"
     fi
 
-    local zshenv=${HOME}/.zshenv
-    # Backup the existing .zshenv if necessary.
-    if file_exists "${zshenv}" && ! is_symlink "${zshenv}"; then
-        backup_file "${zshenv}"
+    local zprofile=${HOME}/.zprofile
+    # Backup the existing .zprofile if necessary.
+    if file_exists "${zprofile}" && ! is_symlink "${zprofile}"; then
+        backup_file "${zprofile}"
     fi
-    # Create symlink to our .zshenv file.
-    if ! file_exists "${zshenv}"; then
-        info "Creating symlink for ~/.zshenv"
-        ln -s -f "${my_dir}/conf/zsh/.zshenv" "${zshenv}"
+    # Create symlink to our .zprofile file.
+    if ! file_exists "${zprofile}"; then
+        info "Creating symlink for ~/.zprofile"
+        ln -s -f "${my_dir}/conf/zsh/.zprofile" "${zprofile}"
     fi
 
     success "Configured zsh"
@@ -290,7 +290,7 @@ main() {
     source "${my_dir}/scripts/helpers.sh"
 
     # Path to the sqlite database that stores user data.
-    db="$my_dir/dotfiles.db"
+    db="${my_dir}/dotfiles.db"
     # Preference args defaults.
     update=false   # update user data
     verbose=false  # verbosity
@@ -314,7 +314,7 @@ main() {
     fi
 
     load_data
-    if [[ ${update} == true ]]; then
+    if [[ "${update}" == true ]]; then
         update_data
     fi
     show_data
