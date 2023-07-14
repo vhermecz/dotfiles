@@ -202,13 +202,9 @@ do_aws_stuff() {
         mkdir -p "${awsdir}"
     fi
 
-    local awscfg=${awsdir}/config
-    # Backup the existing config if necessary.
-    if file_exists "${awscfg}" && ! is_symlink "${awscfg}"; then
-        backup_file "${awscfg}"
-    fi
     # Create hard link to our config.
     # Uses a hard link instead of a symlink so it can be used in a docker volume mount.
+    local awscfg=${awsdir}/config
     if ! file_exists "${awscfg}"; then
         info "Creating hard link for ~/.aws/config"
         ln -f "${my_dir}/conf/aws/config" "${awscfg}"
