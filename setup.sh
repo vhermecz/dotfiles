@@ -207,10 +207,11 @@ do_aws_stuff() {
     if file_exists "${awscfg}" && ! is_symlink "${awscfg}"; then
         backup_file "${awscfg}"
     fi
-    # Create symlink to our config.
+    # Create hard link to our config.
+    # Uses a hard link instead of a symlink so it can be used in a docker volume mount.
     if ! file_exists "${awscfg}"; then
-        info "Creating symlink for ~/.aws/config"
-        ln -s -f "${my_dir}/conf/aws/config" "${awscfg}"
+        info "Creating hard link for ~/.aws/config"
+        ln -f "${my_dir}/conf/aws/config" "${awscfg}"
     fi
 
     success "Configured awscli"
