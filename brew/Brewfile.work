@@ -1,11 +1,8 @@
 # Stuff I want installed everywhere, but is for work
 # so I might not always need it.
 
-brew 'ansible'
 brew 'argocd'
 brew 'awscli'
-brew 'cfn-flip'
-brew 'cfn-lint'
 brew 'helm'
 brew 'hey'
 brew 'kubernetes-cli'
@@ -13,6 +10,7 @@ brew 'kube-ps1'
 brew 'kubectx'
 brew 'linkerd'
 brew 'postgresql@15'
+brew 'redis'
 brew 'stern'
 brew 'trivy'
 brew 'velero'
