@@ -3,24 +3,27 @@
 # Does a git pull for every subdir in a directory.
 # Handy for making sure a bunch of repos are up-to-date with one command.
 git-pull-dirs() {
-    # Get all directories. This is not recursive, so we only go one level deep.
-    for d in */ ; do
-        # Change to the current dir.
-        cd "$d" || return
+    startdir=$(pwd)
+
+    # Find any directory that contains a .git directory.
+    paths=()
+    while IFS='' read -r line; do paths+=("$line"); done < <(find ~+ -path "*/.git" | sort)
+
+    for p in "${paths[@]}"; do
+        # Strip the .git directory from the path.
+        d="${p%\/.git}"
+
         echo ""
-        echo "checking $d..."
-        # If there's a .git directory in here, this is a repo, so...
-        if [[ -d ".git" ]]; then
-            # ...switch to main if we're not already using it...
-            if [[ $(git branch --show-current) != $(git_main_branch) ]]; then
-                git switch "$(git_main_branch)"
-            fi
-            # ...then pull everything.
-            git pull --all
-        else
-            echo "$d is not a git repo"
+        echo "checking ${d#"$startdir"}..."
+
+        cd "${d}" || return
+        # Switch to main if we're not already using it...
+        if [[ $(git branch --show-current) != $(git_main_branch) ]]; then
+            git switch "$(git_main_branch)"
         fi
-        # CD up one level so we can do it again for the next dir.
-        cd .. || return
+        # ...then pull everything.
+        git pull --all
     done
+
+    cd "$startdir" || return
 }
