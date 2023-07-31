@@ -192,6 +192,8 @@ do_brew_stuff() {
 
     info "\nUpdating brew casks"
     brew cu --all
+    info "\nUpdating other brew stuff"
+    brew upgrade
 }
 
 do_aws_stuff() {
