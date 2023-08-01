@@ -57,3 +57,10 @@ sso_account_id = 679855187763
 sso_role_name = administrators
 region = us-east-1
 cli_pager = 
+
+[profile arrivalist-admin]
+sso_session = airdna
+sso_account_id = 851165831466
+sso_role_name = administrators
+region = us-east-1
+cli_pager = 
