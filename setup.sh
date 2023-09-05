@@ -46,7 +46,7 @@ create_db() {
             brew_work TEXT);"
     sqlite3 "${db}" "
         INSERT INTO userdata (id, repo_dir, my_name, my_email, work_email, company, brew_home, brew_work)
-        VALUES (1, 'git', 'My Name', 'my@email', 'work@email', 'company-name', 'N', 'N');"
+        VALUES (1, 'work', 'My Name', 'my@email', 'work@email', 'company-name', 'N', 'N');"
 }
 
 # Load user data from the DB
@@ -219,12 +219,12 @@ do_git_stuff() {
     local git_root=${HOME}/${REPO_DIR}
 
     # Create the git repo directories if they don't exist.
-    local personal="${git_root}/personal"
+    local personal="${git_root}/own"
     if ! dir_exists "${personal}"; then
         info "Creating ${personal}"
         mkdir -p "${personal}"
     fi
-    local public="${git_root}/public"
+    local public="${git_root}/source"
     if ! dir_exists "${public}"; then
         info "Creating ${public}"
         mkdir -p "${public}"
