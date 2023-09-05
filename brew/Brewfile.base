@@ -34,6 +34,7 @@ cask 'jetbrains-toolbox'
 cask 'zoom'
 cask 'dropbox'
 cask 'keepassxc'
+cask 'google-drive'
 
 # app store
 # mas 'Example', id: 1234567890
