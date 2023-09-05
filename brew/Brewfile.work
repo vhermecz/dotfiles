@@ -1,8 +1,11 @@
 # Stuff I want installed everywhere, but is for work
 # so I might not always need it.
 
+tap "aws/tap"
+
 brew 'argocd'
 brew 'awscli'
+brew 'eks-node-viewer'
 brew 'helm'
 brew 'hey'
 brew 'kubernetes-cli'

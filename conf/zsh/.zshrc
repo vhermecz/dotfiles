@@ -35,3 +35,7 @@ alias npmlogin="aws codeartifact login --profile $SSO_PROFILE --tool npm --repos
 alias pypilogin="aws codeartifact login --profile $SSO_PROFILE --tool pip --repository pypi --domain airdna-svc --domain-owner 537022569116"
 # My aliases
 alias swup="$HOME/git/personal/dotfiles/setup.sh"
+alias nodeview-dev="AWS_PROFILE=airdna-dev-admin eks-node-viewer --kubeconfig ~/.kube/dev-eks-use1 --extra-labels node-group-name --resources cpu,memory"
+alias nodeview-prod="AWS_PROFILE=airdna-prod-admin eks-node-viewer --kubeconfig ~/.kube/prod-eks-use1 --extra-labels node-group-name --resources cpu,memory"
+alias nodeview-svc="AWS_PROFILE=airdna-svc-admin eks-node-viewer --kubeconfig ~/.kube/svc-eks-use1 --extra-labels node-group-name --resources cpu,memory"
+alias nodeview-sandbox="AWS_PROFILE=airdna-sandbox eks-node-viewer --kubeconfig ~/.kube/sandbox-eks-use1 --extra-labels node-group-name --resources cpu,memory"

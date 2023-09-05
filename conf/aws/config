@@ -28,6 +28,14 @@ sso_role_name = techops
 region = us-east-1
 cli_pager = 
 
+[profile arrivalist]
+sso_session = airdna
+sso_account_id = 851165831466
+sso_role_name = arrivalist-engineering
+region = us-east-1
+cli_pager = 
+
+
 # ADMIN PROFILES
 
 [profile airdna-dev-admin]
