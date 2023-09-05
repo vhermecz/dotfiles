@@ -32,6 +32,8 @@ cask 'sublime-text'
 cask 'visual-studio-code'
 cask 'jetbrains-toolbox'
 cask 'zoom'
+cask 'dropbox'
+cask 'keepassxc'
 
 # app store
 # mas 'Example', id: 1234567890
