@@ -25,18 +25,16 @@ cask 'docker'
 cask 'firefox'
 cask 'google-chrome'
 cask 'iterm2'
-cask 'logi-options-plus'
 cask 'openvpn-connect'
 cask 'signal'
 cask 'slack'
 cask 'sublime-text'
 cask 'visual-studio-code'
+cask 'jetbrains-toolbox'
 cask 'zoom'
 
 # app store
-mas 'CopyClip', id: 1020812363
-mas 'DaisyDisk', id: 411643860
-mas 'Pixelmator Pro', id: 1289583905
+# mas 'Example', id: 1234567890
 
 # vscode extensions
 vscode "bierner.markdown-preview-github-styles"
