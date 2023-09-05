@@ -7,6 +7,5 @@ cask 'superduper'
 cask 'transmit'
 cask 'waves-central'
 
-mas 'Logic Pro', id: 634148309
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
