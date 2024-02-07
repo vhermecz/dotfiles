@@ -39,9 +39,11 @@ cask 'keepassxc'
 cask 'google-drive'
 cask 'dbeaver-community'
 cask 'double-commander'
+cask 'meld'
 
 # app store
 # mas 'Example', id: 1234567890
+# mas 'XCode', id: 497799835
 
 # vscode extensions
 vscode "bierner.markdown-preview-github-styles"
