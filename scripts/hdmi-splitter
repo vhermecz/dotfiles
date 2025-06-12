@@ -1,0 +1,20 @@
+#!/bin/bash
+
+MODE_NAME="1920x1080_60.00"
+
+case "$1" in
+  on)
+    xrandr --newmode "$MODE_NAME" 173.00 1920 2048 2248 2576 1080 1083 1088 1120 -hsync +vsync
+    xrandr --addmode HDMI-2 "$MODE_NAME"
+    xrandr --output HDMI-2 --mode "$MODE_NAME" --auto
+    ;;
+  off)
+    xrandr --output HDMI-2 --off
+    xrandr --delmode HDMI-2 "$MODE_NAME"
+    xrandr --rmmode "$MODE_NAME"
+    ;;
+  *)
+    echo "Usage: $0 {on|off}"
+    exit 1
+    ;;
+esac
