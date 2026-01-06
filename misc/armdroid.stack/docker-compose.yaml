@@ -1,7 +1,7 @@
 
 x-proxy-settings: &proxy-config
-  HTTP_PROXY: "http://privoxy:8118"
-  HTTPS_PROXY: "http://privoxy:8118"
+  HTTP_PROXY: "http://tor-gateway:8118"
+  HTTPS_PROXY: "http://tor-gateway:8118"
   NO_PROXY: "127.0.0.1,localhost,redroid,filebrowser,scrcpy-web"
 
 services:
@@ -21,9 +21,11 @@ services:
       - androidboot.redroid_gpu_mode=host
       # Point to Privoxy
       - androidboot.redroid_net_proxy_type=http
-      - androidboot.redroid_net_proxy_host=privoxy
+      - androidboot.redroid_net_proxy_host=tor-gateway
       - androidboot.redroid_net_proxy_port=8118
       - androidboot.redroid_net_proxy_exclude_list=localhost,scrcpy-web
+    depends_on:
+      - tor-gateway
 
   # 2. Mobile Security Framework
   mobsf:
@@ -39,7 +41,7 @@ services:
       MOBSF_PLATFORM_URL: "http://redroid:5555"
     depends_on:
       - redroid
-      - privoxy
+      - tor-gateway
 
   # 3. Web-based Screen Control (ws-scrcpy)
   scrcpy-web:
@@ -64,27 +66,20 @@ services:
       - ./data:/srv  # Manages the data folders for Redroid/MobSF
       - ./filebrowser.db:/database.db
 
-  # 5. The Switchboard (Privoxy)
-  privoxy:
-    image: vimagick/privoxy
-    container_name: privoxy
+  # 5. The Switchboard (Privoxy, Tor SOCKS5 Proxy)
+  tor-gateway:
+    image: ghcr.io/avpnusr/torprivoxy:latest
+    container_name: tor-gateway
     restart: unless-stopped
     volumes:
+      # These use the same config logic we set up
+      - ./data/tor/torrc:/etc/tor/torrc
       - ./data/privoxy/config:/etc/privoxy/config
     ports:
-      - "8118:8118" # Expose if you want to use it from your PC too
+      - "8118:8118" # Privoxy Port
+      - "9050:9050" # Tor SOCKS Port
 
-  # 6. Tor SOCKS5 Proxy
-  tor-proxy:
-    image: peterdavehello/tor-socks-proxy:latest
-    container_name: tor-proxy
-    restart: unless-stopped
-    volumes:
-      - ./data/tor/torrc:/etc/tor/torrc
-    ports:
-      - "9050:9150" # Expose SOCKS5 port
-
-# 7. Dashboard (Homepage)
+  # 6. Dashboard (Homepage)
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
