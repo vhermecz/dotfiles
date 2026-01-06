@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  # 1. Android Emulator
+  redroid:
+    image: redroid/redroid:13.0.0-latest
+    container_name: redroid
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./data/redroid:/data
+    command:
+      - androidboot.redroid_width=720
+      - androidboot.redroid_height=1280
+      - androidboot.redroid_gpu_mode=host
+
+  # 2. Mobile Security Framework
+  mobsf:
+    image: opensecurity/mobile-security-framework-mobsf:latest
+    container_name: mobsf
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/mobsf:/root/.MobSF
+    depends_on:
+      - redroid
+
+  # 3. Web-based Screen Control (ws-scrcpy)
+  scrcpy-web:
+    image: scrcpy/ws-scrcpy
+    container_name: scrcpy-web
+    restart: unless-stopped
+    ports:
+      - "8002:8000"  # Access at http://IP:8002
+    depends_on:
+      - redroid
+    # Wait for Redroid to boot, then connect
+    command: sh -c "adb connect redroid:5555 && npm start"
+
+  # 4. File Manager
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    restart: unless-stopped
+    ports:
+      - "8003:80"    # Access at http://IP:8003
+    volumes:
+      - ./data:/srv  # Manages the data folders for Redroid/MobSF
+      - ./filebrowser.db:/database.db
+
+# 5. Tor SOCKS5 Proxy
+  tor-proxy:
+    image: peterdavehello/tor-socks-proxy:latest
+    container_name: tor-proxy
+    restart: unless-stopped
+    ports:
+      - "9050:9150" # Expose SOCKS5 port
+
+volumes:
+  redroid-data:
+  mobsf-data:
