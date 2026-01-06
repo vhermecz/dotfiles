@@ -1,4 +1,8 @@
-version: '3'
+
+x-proxy-settings: &proxy-config
+  HTTP_PROXY: "http://privoxy:8118"
+  HTTPS_PROXY: "http://privoxy:8118"
+  NO_PROXY: "127.0.0.1,localhost,redroid,filebrowser,scrcpy-web"
 
 services:
   # 1. Android Emulator
@@ -15,6 +19,11 @@ services:
       - androidboot.redroid_width=720
       - androidboot.redroid_height=1280
       - androidboot.redroid_gpu_mode=host
+      # Point to Privoxy
+      - androidboot.redroid_net_proxy_type=http
+      - androidboot.redroid_net_proxy_host=privoxy
+      - androidboot.redroid_net_proxy_port=8118
+      - androidboot.redroid_net_proxy_exclude_list=localhost,scrcpy-web
 
   # 2. Mobile Security Framework
   mobsf:
@@ -25,12 +34,16 @@ services:
       - "8000:8000"
     volumes:
       - ./data/mobsf:/root/.MobSF
+    environment:
+      <<: *proxy-config
+      MOBSF_PLATFORM_URL: "http://redroid:5555"
     depends_on:
       - redroid
+      - privoxy
 
   # 3. Web-based Screen Control (ws-scrcpy)
   scrcpy-web:
-    image: scrcpy/ws-scrcpy
+    image: smanx/ws-scrcpy:latest
     container_name: scrcpy-web
     restart: unless-stopped
     ports:
@@ -38,7 +51,7 @@ services:
     depends_on:
       - redroid
     # Wait for Redroid to boot, then connect
-    command: sh -c "adb connect redroid:5555 && npm start"
+    command: sh -c "adb connect redroid:5555 && node dist/index.js"
 
   # 4. File Manager
   filebrowser:
@@ -51,13 +64,39 @@ services:
       - ./data:/srv  # Manages the data folders for Redroid/MobSF
       - ./filebrowser.db:/database.db
 
-# 5. Tor SOCKS5 Proxy
+  # 5. The Switchboard (Privoxy)
+  privoxy:
+    image: vimagick/privoxy
+    container_name: privoxy
+    restart: unless-stopped
+    volumes:
+      - ./data/privoxy/config:/etc/privoxy/config
+    ports:
+      - "8118:8118" # Expose if you want to use it from your PC too
+
+  # 6. Tor SOCKS5 Proxy
   tor-proxy:
     image: peterdavehello/tor-socks-proxy:latest
     container_name: tor-proxy
     restart: unless-stopped
+    volumes:
+      - ./data/tor/torrc:/etc/tor/torrc
     ports:
       - "9050:9150" # Expose SOCKS5 port
+
+# 7. Dashboard (Homepage)
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    volumes:
+      - ./data/homepage/config:/app/config
+      # Mount Docker socket so it can see if containers are running (optional status dots)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - APP_IP=192.168.100.19
 
 volumes:
   redroid-data:

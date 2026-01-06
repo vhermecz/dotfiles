@@ -49,7 +49,7 @@ sudo docker run -d \
   portainer/portainer-ce:latest
 ```
 
-- Launch `docker-compose.yaml`
+- Launch `docker-compose.yaml` via `docker compose up -d`
 
 # Switch Proxy model
 

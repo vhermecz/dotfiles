@@ -1,0 +1,8 @@
+SocksPort 0.0.0.0:9150
+Log notice stdout
+
+# --- COUNTRY CONFIGURATION ---
+# Tell Tor to ONLY use these countries for the final hop
+ExcludeExitNodes {ru},{cn},{ir}
+# ExitNodes {us}
+StrictNodes 1
