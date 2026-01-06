@@ -40,6 +40,7 @@ cask 'google-drive'
 cask 'dbeaver-community'
 cask 'double-commander'
 cask 'meld'
+cask 'postman'
 
 # app store
 # mas 'Example', id: 1234567890
