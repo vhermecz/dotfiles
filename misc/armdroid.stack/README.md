@@ -1,4 +1,4 @@
-# Install
+# Install (stock Orange Pi 5 Plus)
 
 - Enable and initialize NVMe drive
   - Create install medium
@@ -35,6 +35,8 @@ sudo usermod -aG docker $USER
 # 3. Activate group changes (or logout and login again)
 newgrp docker
 ```
+
+# Install (Android stack)
 
 - Setup portainer
 
