@@ -1,21 +1,21 @@
 - Mobile Security Lab:
     - MobSF (Scanner):
         icon: sh-mobsf
-        href: http://{{APP_IP}}:8000
+        href: http://{{HOMEPAGE_VAR_APP_IP}}:8001
         description: Static & Dynamic Analysis
     - Android View (Scrcpy):
         icon: android
-        href: http://{{APP_IP}}:8002
+        href: http://{{HOMEPAGE_VAR_APP_IP}}:8002
         description: Remote Control Screen
     - File Manager:
         icon: filebrowser
-        href: http://{{APP_IP}}:8003
+        href: http://{{HOMEPAGE_VAR_APP_IP}}:8003
         description: Upload APKs here
 
 - Infrastructure:
     - Portainer:
         icon: portainer
-        href: https://{{APP_IP}}:9443
+        href: https://{{HOMEPAGE_VAR_APP_IP}}:9443
         description: Docker Management
     - Tor Proxy:
         icon: tor-browser
@@ -23,4 +23,4 @@
         description: "SOCKS5: Port 9150"
         widget:
             type: tor
-            url: http://tor-proxy:9150 # Internal docker network call
+            url: http://{{HOMEPAGE_VAR_APP_IP}}:9150 # Internal docker network call

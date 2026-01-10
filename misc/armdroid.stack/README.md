@@ -61,3 +61,10 @@ sudo docker run -d \
 
 - ws-scrcpy
 - pip3 install frida-tools
+
+# Useful info
+
+- https://composables.com/android-distribution-chart
+- Simple app: https://github.com/BrunoRochaDev/AlwaysOnTimer/releases
+- GPU related
+  - https://github.com/redroid-rockchip (might be useful)

@@ -7,7 +7,8 @@ x-proxy-settings: &proxy-config
 services:
   # 1. Android Emulator
   redroid:
-    image: redroid/redroid:13.0.0-latest
+    image: redroid/redroid:11.0.0-latest  # MobSf requires API level 30 for dynamic anal
+    # image: iceblacktea/redroid-arm64:12.0.0-250116  # NOTE: No v11 avail anymore
     container_name: redroid
     restart: unless-stopped
     privileged: true
@@ -15,10 +16,26 @@ services:
       - "5555:5555"
     volumes:
       - ./data/redroid:/data
+      - /dev/mali0:/dev/mali0       # 👈 Pass the GPU hardware
+      - /dev/dri:/dev/dri
+      - /dev/dma_heap:/dev/dma_heap # 👈 This is the missing piece
+      - /dev/graphics:/dev/graphics # 👈 Pass the display nodes
     command:
       - androidboot.redroid_width=720
       - androidboot.redroid_height=1280
-      - androidboot.redroid_gpu_mode=host
+      - androidboot.redroid_gpu_mode=guest
+      - redroid.gpu.node=/dev/dri/renderD128 # 👈 Specify the node
+      - androidboot.redroid_use_angle=0   # 👈 Disable the layer causing the crash
+      #- androidboot.redroid_gpu_mode=mali # 👈 Force Mali acceleration (other values: host, guest)
+      - androidboot.redroid_fps=60
+      - androidboot.redroid_no_bluetooth=1  # NOTE: This is halucination probably
+      - "ro.boot.wificountry=US"
+      - "ro.bluetooth.library_name=null"
+      - "persist.bluetooth.enabled=false" # 👈 This is the standard Android property
+      - persist.sys.timezone=UTC
+      - persist.google.gms.disable=1       # Disable GMS if you don't need Play Store
+      - ro.kernel.android.checkjni=0       # Speed up the runtime
+      - ro.telephony.default_network=9     # Stop looking for a modem/SIM
       # Point to Privoxy
       - androidboot.redroid_net_proxy_type=http
       - androidboot.redroid_net_proxy_host=tor-gateway
@@ -33,12 +50,19 @@ services:
     container_name: mobsf
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./data/mobsf:/root/.MobSF
     environment:
       <<: *proxy-config
-      MOBSF_PLATFORM_URL: "http://redroid:5555"
+      MOBSF_ANALYZER_IDENTIFIER: "redroid:5555"
+      MOBSF_ADB_ROOT: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     depends_on:
       - redroid
       - tor-gateway
@@ -91,7 +115,8 @@ services:
       # Mount Docker socket so it can see if containers are running (optional status dots)
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      - APP_IP=192.168.100.19
+      - HOMEPAGE_VAR_APP_IP=192.168.100.19
+      - HOMEPAGE_ALLOWED_HOSTS=192.168.100.19
 
 volumes:
   redroid-data:
